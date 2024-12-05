@@ -6,26 +6,6 @@ BASE_PATH = Path(__file__).parent
 from typing import Callable
 
 
-def run_solution(
-    day: int,
-    parse_input: Callable,
-    puzzle_1: Callable,
-    puzzle_2: Callable,
-    example: str,
-) -> None:
-    data = parse_input(get_input(day))
-    example = parse_input(example.strip())
-
-    print(f"Day {day}")
-    print("Puzzle 1")
-    print("Example:", puzzle_1(example))
-    print("Result:", puzzle_1(data))
-
-    print("Puzzle 2")
-    print("Example:", puzzle_2(example))
-    print("Result:", puzzle_2(data))
-
-
 def run_solution_pretty(
     day: int,
     parse_input_1: Callable,
@@ -44,7 +24,6 @@ def run_solution_pretty(
     example_1 = parse_input_1(example_1.strip())
     example_2 = parse_input_2(example_2.strip()) if example_2 else example_1
     only_example = os.getenv("ONLY_EXAMPLE", "false").lower() == "true"
-
 
     print(f"\033[1mDay {day}\033[0m")
     print("\n", end="")

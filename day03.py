@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from enum import Enum
 import re
 from typing import Union
 

@@ -1,6 +1,6 @@
 from collections import Counter
 
-from utils import run_solution, run_solution_pretty
+from utils import run_solution_pretty
 
 EXAMPLE = """
 3   4
