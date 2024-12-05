@@ -44,8 +44,8 @@ def puzzle_2(data: tuple[list[int], list[int]]) -> int:
 if __name__ == "__main__":
     run_solution_pretty(
         day=1,
-        example=EXAMPLE,
-        parse_input=parse_input,
+        example_1=EXAMPLE,
+        parse_input_1=parse_input,
         puzzle_1=puzzle_1,
         puzzle_2=puzzle_2,
     )
