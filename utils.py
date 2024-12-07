@@ -1,9 +1,8 @@
 import os
 from pathlib import Path
+from typing import Callable
 
 BASE_PATH = Path(__file__).parent
-
-from typing import Callable
 
 
 def run_solution_pretty(
