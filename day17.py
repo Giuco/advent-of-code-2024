@@ -1,10 +1,4 @@
-from collections import deque
 from collections.abc import Callable
-from functools import cache
-from itertools import batched
-from multiprocessing.reduction import register
-
-from black.trans import defaultdict
 
 from utils import run_solution_pretty
 
@@ -36,7 +30,6 @@ def parse_input(input_str: str) -> T:
     return (registers["A"], registers["B"], registers["C"]), instructions
 
 
-@cache
 def get_value(operand: int, registers: Registers) -> int:
     if operand in {0, 1, 2, 3}:
         return operand
@@ -51,11 +44,11 @@ def get_value(operand: int, registers: Registers) -> int:
 
 
 def adv(operand: int, registers: Registers, ip: int) -> tuple[Registers, Outputs, int]:
-    numerator = registers[0]
-    denominator = 2 ** get_value(operand, registers)
-    result = int(numerator / denominator)
-
-    registers = (result, registers[1], registers[2])
+    registers = (
+        registers[0] >> get_value(operand, registers),
+        registers[1],
+        registers[2],
+    )
     return registers, [], ip + 2
 
 
@@ -88,24 +81,26 @@ def out(operand: int, registers: Registers, ip: int) -> tuple[Registers, Outputs
 
 
 def bdv(operand: int, registers: Registers, ip: int) -> tuple[Registers, Outputs, int]:
-    numerator = registers[0]
-    denominator = 2 ** get_value(operand, registers)
-    result = int(numerator / denominator)
-
-    registers = (registers[0], result, registers[2])
+    registers = (
+        registers[0],
+        registers[0] >> get_value(operand, registers),
+        registers[2],
+    )
     return registers, [], ip + 2
 
 
 def cdv(operand: int, registers: Registers, ip: int) -> tuple[Registers, Outputs, int]:
-    numerator = registers[0]
-    denominator = 2 ** get_value(operand, registers)
-    result = int(numerator / denominator)
-
-    registers = (registers[0], registers[1], result)
+    registers = (
+        registers[0],
+        registers[1],
+        registers[0] >> get_value(operand, registers),
+    )
     return registers, [], ip + 2
 
 
-def rr(instruction: int, operand: int, registers: Registers, ip: int) -> tuple[Registers, Outputs, int]:
+def rr(
+    instruction: int, operand: int, registers: Registers, ip: int
+) -> tuple[Registers, Outputs, int]:
     return INSTRUCTIONS[instruction](operand, registers, ip)
 
 
@@ -123,41 +118,36 @@ INSTRUCTIONS: dict[int, InstructionFn] = {
 }
 
 
-def puzzle_1(data: T) -> str:
+def puzzle_1(data: T) -> list[int]:
     registers, instructions = data
     outputs: list[int] = []
     ip = 0
 
-    print("Start")
-    print(f"Registers: {registers}")
-    print(f"Outputs: {outputs}")
-
     while ip < len(instructions):
         instruction, operand = instructions[ip], instructions[ip + 1]
-        print(f"\nInstruction: {ip=}. {instruction=}, {operand=}")
 
         registers, new_outputs, ip = rr(
             instruction=instruction, operand=operand, registers=registers, ip=ip
         )
         outputs.extend(new_outputs)
-        print(f"Registers: {registers}")
-        print(f"Outputs: {outputs}")
 
-    return ",".join(map(str, outputs))
+    return outputs
 
 
 def puzzle_2(data: T) -> int:
-    original_registers, instructions = data
-    expected_output = ",".join(map(str, instructions))
-    a = 0
-    while True:
-        print("This doesn't work for real input")
-        actual_output = puzzle_1(((a, original_registers[1], original_registers[2]), instructions.copy()))
-        if actual_output == expected_output:
-            break
-        a += 1
+    _, instructions = data
+    candidates = [0]
+    for n in range(len(instructions)):
+        next_candidates = []
+        for val in candidates:
+            for i in range(8):
+                target = (val << 3) + i
+                if puzzle_1(((target, 0, 0), instructions)) == instructions[-n - 1 :]:
+                    next_candidates.append(target)
 
-    return a
+        candidates = next_candidates
+
+    return min(candidates)
 
 
 if __name__ == "__main__":
