@@ -1,5 +1,5 @@
-from utils import run_solution_pretty
 from itertools import pairwise
+from utils import run_solution_pretty
 
 EXAMPLE = """
 7 6 4 2 1
@@ -14,40 +14,29 @@ T = list[list[int]]
 
 
 def parse_input(input_str: str) -> T:
-    lines = input_str.split("\n")
-    return [list(map(int, line.split())) for line in lines]
+    return [list(map(int, line.split())) for line in input_str.split("\n")]
 
 
-def is_safe(row: list[int]) -> bool:
-    diff = [x - y for x, y in pairwise(row)]
-    rule1 = all(d > 0 for d in diff) or all(d < 0 for d in diff)
-    rule2 = all(1 <= abs(d) <= 3 for d in diff)
-    return rule1 and rule2
+def is_safe(levels: list[int]) -> bool:
+    diffs = [b - a for a, b in pairwise(levels)]
+    all_same_direction = all(d > 0 for d in diffs) or all(d < 0 for d in diffs)
+    valid_range = all(1 <= abs(d) <= 3 for d in diffs)
+    return all_same_direction and valid_range
 
 
-def remove_1(row: list[int]) -> list[list[int]]:
-    return [
-        row[:i] + row[i + 1:]
-        for i in range(len(row))
-    ]
+def variants_with_one_removed(levels: list[int]) -> list[list[int]]:
+    return [levels[:i] + levels[i + 1:] for i in range(len(levels))]
 
 
 def puzzle_1(data: T) -> int:
-    return sum(is_safe(row) for row in data)
+    return sum(is_safe(levels) for levels in data)
 
 
 def puzzle_2(data: T) -> int:
-    n_safe = 0
-    for row in data:
-        if is_safe(row):
-            n_safe += 1
-        else:
-            for new_row in remove_1(row):
-                if is_safe(new_row):
-                    n_safe += 1
-                    break
-
-    return n_safe
+    return sum(
+        is_safe(levels) or any(is_safe(variant) for variant in variants_with_one_removed(levels))
+        for levels in data
+    )
 
 
 if __name__ == "__main__":
