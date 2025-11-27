@@ -28,7 +28,7 @@ def puzzle_1(data: T) -> int:
 def puzzle_2(data: T) -> int:
     left, right = data
     freq = Counter(right)
-    return sum(x * freq[x] for x in left)
+    return sum(x * freq.get(x, 0) for x in left)
 
 
 
