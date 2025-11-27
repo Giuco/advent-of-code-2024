@@ -11,33 +11,24 @@ EXAMPLE = """
 3   3
 """.strip()
 
-
-def parse_input(input_str: str) -> tuple[list[int], list[int]]:
-    lines = input_str.split("\n")
-    a = []
-    b = []
-    for line in lines:
-        x, y = line.split()
-        a.append(int(x))
-        b.append(int(y))
-    return a, b
+T = tuple[list[int], list[int]]
 
 
-def puzzle_1(data: tuple[list[int], list[int]]) -> int:
-    total: int = 0
-    for x, y in zip(sorted(data[0]), sorted(data[1])):
-        total += abs(x - y)
-    return total
+def parse_input(input_str: str) -> T:
+    pairs = [line.split() for line in input_str.split("\n")]
+    left, right = zip(*pairs)
+    return list(map(int, left)), list(map(int, right))
 
 
-def puzzle_2(data: tuple[list[int], list[int]]) -> int:
-    freq = Counter(data[1])
+def puzzle_1(data: T) -> int:
+    left, right = data
+    return sum(abs(x - y) for x, y in zip(sorted(left), sorted(right)))
 
-    total: int = 0
-    for x in data[0]:
-        total += x * freq.get(x, 0)
 
-    return total
+def puzzle_2(data: T) -> int:
+    left, right = data
+    freq = Counter(right)
+    return sum(x * freq.get(x, 0) for x in left)
 
 
 
